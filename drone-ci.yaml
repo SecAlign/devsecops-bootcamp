@@ -1,0 +1,99 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: drone-data-pvc
+  namespace: devsecops
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drone
+  namespace: devsecops
+  labels:
+    app: drone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drone
+  template:
+    metadata:
+      labels:
+        app: drone
+    spec:
+      hostAliases:                     
+        - ip: "10.43.62.129"
+          hostnames:
+            - "git.bootcamp.althunibat.xyz"
+      containers:
+        - name: drone
+          image: drone/drone:2
+          ports:
+            - containerPort: 80
+          env:
+            - name: DRONE_GITEA_SERVER
+              value: "https://git.bootcamp.althunibat.xyz/"
+            - name: DRONE_GITEA_CLIENT_ID
+              value: "9e2122ed-375c-4a5f-a6c6-d93832f9f3d9"
+            - name: DRONE_GITEA_CLIENT_SECRET
+              value: "gto_ugoqmuigtmzivapl6zzks65ot6sqyqdysdnvvvldav5lcv7hmrlq"
+            - name: DRONE_RPC_SECRET
+              value: "547a6cda431d60a909b1f0f91f2deccd"
+            - name: DRONE_SERVER_HOST
+              value: "drone-ci.bootcamp.althunibat.xyz"
+            - name: DRONE_SERVER_PROTO
+              value: "https"
+          volumeMounts:
+            - name: drone-data
+              mountPath: /data
+      volumes:
+        - name: drone-data
+          persistentVolumeClaim:
+            claimName: drone-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drone
+  namespace: devsecops
+spec:
+  type: ClusterIP
+  selector:
+    app: drone
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drone-ingress
+  namespace: devsecops
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer 
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx  
+  tls:
+    - hosts:
+        - drone-ci.bootcamp.althunibat.xyz
+      secretName: drone-ci-tls
+  rules:
+    - host: drone-ci.bootcamp.althunibat.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: drone
+                port:
+                  number: 80

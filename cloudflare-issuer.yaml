@@ -10,7 +10,10 @@ spec:
     privateKeySecretRef:
       name: cloudflare-issuer-key
     solvers:
-    - dns01:
+    - selector:
+        dnsZones:
+          - "althunibat.xyz"
+      dns01:
         cloudflare:
           apiTokenSecretRef:
             name: cloudflare-api-token-secret

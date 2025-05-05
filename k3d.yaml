@@ -4,21 +4,23 @@ kind: Simple # internally, we also have a Cluster config, which is not yet avail
 metadata:
   name: bootcamp # name that you want to give to your cluster (will still be prefixed with `k3d-`)
 servers: 1 # same as `--servers 1`
-agents: 2 # same as `--agents 2`
-kubeAPI: # same as `--api-port myhost.my.domain:6445` (where the name would resolve to 127.0.0.1)
+agents: 3 # same as `--agents 2`
+kubeAPI:
+  # same as `--api-port myhost.my.domain:6445` (where the name would resolve to 127.0.0.1)
   host: "k3d.192.168.106.2.nip.io" # important for the `server` setting in the kubeconfig
   hostIP: "192.168.106.2" # where the Kubernetes API will be listening on
   hostPort: "6445" # where the Kubernetes API listening port will be mapped to on your host system
 token: "LS+OxnAsmWgtLCRq" # same as `--token superSecretToken`
 ports:
-  - port: 80:80 # same as `--port '8080:80@loadbalancer'`
-    nodeFilters:
-      - loadbalancer
-  - port: 443:443 # same as `--port '8080:80@loadbalancer'`
-    nodeFilters:
-      - loadbalancer
+- port: 80:80 # same as `--port '8080:80@loadbalancer'`
+  nodeFilters:
+  - loadbalancer
+- port: 443:443 # same as `--port '8080:80@loadbalancer'`
+  nodeFilters:
+  - loadbalancer
 options:
-  k3d: # k3d runtime settings
+  k3d:
+    # k3d runtime settings
     wait: true # wait for cluster to be usable before returning; same as `--wait` (default: true)
     timeout: "60s" # wait timeout before aborting; same as `--timeout 60s`
     disableLoadbalancer: false # same as `--no-lb`
@@ -26,26 +28,32 @@ options:
     disableRollback: false # same as `--no-Rollback`
     loadbalancer:
       configOverrides:
-        - settings.workerConnections=2048
-  k3s: # options passed on to K3s itself
-    extraArgs: # additional arguments passed to the `k3s server|agent` command; same as `--k3s-arg`
-      - arg: "--tls-san=k3d.192.168.106.2.nip.io"
-        nodeFilters:
-          - server:*
-      - arg: "--flannel-backend=none"
-        nodeFilters:
-          - server:*
-      - arg: "--disable-network-policy"
-        nodeFilters:
-          - server:*
-      - arg: "-cluster-cidr=192.168.0.0/16"
-        nodeFilters:
-          - server:*
+      - settings.workerConnections=2048
+  k3s:
+    # options passed on to K3s itself
+    extraArgs:
+    # additional arguments passed to the `k3s server|agent` command; same as `--k3s-arg`
+    - arg: "--tls-san=k3d.192.168.106.2.nip.io"
+      nodeFilters:
+      - server:*
+    - arg: "--flannel-backend=none"
+      nodeFilters:
+      - server:*
+    - arg: "--disable-network-policy"
+      nodeFilters:
+      - server:*
+    - arg: "--cluster-cidr=192.168.0.0/16"
+      nodeFilters:
+      - server:*
+    - arg: "--disable=traefik"
+      nodeFilters:
+      - server:*
   kubeconfig:
     updateDefaultKubeconfig: true # add new cluster to your default Kubeconfig; same as `--kubeconfig-update-default` (default: true)
     switchCurrentContext: true # also set current-context to the new cluster's context; same as `--kubeconfig-switch-context` (default: true)
-  runtime: # runtime (docker) specific options
+  runtime:
+    # runtime (docker) specific options
     ulimits:
-      - name: nofile
-        soft: 26677
-        hard: 26677
+    - name: nofile
+      soft: 26677
+      hard: 26677
