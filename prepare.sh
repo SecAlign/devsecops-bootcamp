@@ -85,12 +85,12 @@ helm install \
 
 
 
-cat cloudflare.yaml | kubeseal \
+cat cloudflare-token.yaml | kubeseal \
       --controller-name=sealed-secrets-controller \
       --controller-namespace=kube-system \
-      --format yaml > sealed-cloudflare.yaml
+      --format yaml > sealed-cloudflare-token.yaml
 
-kubectl apply -f sealed-cloudflare.yaml
+kubectl apply -f sealed-cloudflare-token.yaml
 kubectl apply -f cloudflare-issuer.yaml
 
 # verify via k9s
