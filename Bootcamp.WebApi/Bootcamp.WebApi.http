@@ -1,0 +1,6 @@
+@Bootcamp_WebApi_HostAddress = http://localhost:5056
+
+GET {{Bootcamp_WebApi_HostAddress}}/users/
+Accept: application/json
+
+###

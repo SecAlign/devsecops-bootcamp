@@ -157,3 +157,27 @@ docker run --detach \
   # validate connectivity through docker logs 
 
   ######## end session 2 ##############
+
+  # create user in gitea
+  # login into gitea using docker ==> create and use personal token
+  # build the image locally, push it into repository.
+  # install kustomize cli
+  brew install kustomize
+ # explain the deployment procedure using kustomize
+ 
+ # change directlry to deploy
+ kubectl create ns myapp
+
+ # generate password for postgresql and update the secret file
+ openssl rand -base64 16
+ # use kubeseal to generate sealed secret
+ cat pgsql-secret.yaml | kubeseal \
+      --controller-name=sealed-secrets-controller \
+      --controller-namespace=kube-system \
+      --format yaml > sealed-pgsql-secret.yaml
+ # delete the original secret file
+ # build kustomization file
+ kustomize init --autodetect
+ kustomize edit set namespace myapp
+ kustomize edit set image webapi=git.bootcamp.althunibat.xyz/gitea_admin/webapi:0.0.1-dev-1
+ kubectl apply -k .

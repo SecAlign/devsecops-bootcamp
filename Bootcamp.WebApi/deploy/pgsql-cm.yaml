@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgsql-config
+  namespace: webapi
+data:
+  # kv format
+  POSTGRES_DB: "api_db"
+  POSTGRES_USER: "postgres"

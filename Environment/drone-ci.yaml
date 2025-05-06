@@ -29,7 +29,7 @@ spec:
         app: drone
     spec:
       hostAliases:                     
-        - ip: "10.43.62.129"
+        - ip: "10.43.216.224"
           hostnames:
             - "git.bootcamp.althunibat.xyz"
       containers:
@@ -41,9 +41,9 @@ spec:
             - name: DRONE_GITEA_SERVER
               value: "https://git.bootcamp.althunibat.xyz/"
             - name: DRONE_GITEA_CLIENT_ID
-              value: "9e2122ed-375c-4a5f-a6c6-d93832f9f3d9"
+              value: "e211b386-f20b-4031-8318-dbe7d1b78099"
             - name: DRONE_GITEA_CLIENT_SECRET
-              value: "gto_ugoqmuigtmzivapl6zzks65ot6sqyqdysdnvvvldav5lcv7hmrlq"
+              value: "gto_rysoohtyvtaqcwrcw6ug4qjnwdbqcfoc3l4zpnrwoayrqo2l7bdq"
             - name: DRONE_RPC_SECRET
               value: "547a6cda431d60a909b1f0f91f2deccd"
             - name: DRONE_SERVER_HOST

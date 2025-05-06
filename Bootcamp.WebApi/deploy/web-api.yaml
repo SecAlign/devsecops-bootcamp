@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-api
+  namespace: webapi
+  labels:
+    app: web-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-api
+  template:
+    metadata:
+      name: web-api
+      labels:
+        app: web-api
+    spec:
+      containers:
+        - name: web-api
+          image: webapi:dev
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DB_PWD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: pgsql-password
+            - name: DB_HOST
+              value: pgsql
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: pgsql-config
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
+      
