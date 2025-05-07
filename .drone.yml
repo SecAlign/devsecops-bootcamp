@@ -1,0 +1,43 @@
+kind: pipeline
+type: docker
+name: default
+
+platform:
+  os: linux
+  arch: arm64
+
+workspace:
+  path: /drone/src
+
+steps:
+  - name: build dotnet
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    volumes:
+      - name: cache
+        path: /drone/src/shared
+    commands:
+      - dotnet publish "Bootcamp.WebApi/Bootcamp.WebApi.csproj" -c release -o /drone/src/shared/publish
+
+  - name: build docker image
+    image: alpine
+    commands:
+      - apk add --no-cache docker-cli docker-cli-buildx
+      - docker buildx build . -f Bootcamp.WebApi/Dockerfile -t webapi:test-2 --load
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: cache
+        path: /drone/src/shared
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: shared
+    temp: { }
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
