@@ -50,6 +50,8 @@ spec:
               value: "drone-ci.bootcamp.althunibat.xyz"
             - name: DRONE_SERVER_PROTO
               value: "https"
+            - name: DRONE_USER_CREATE
+              value: username:gitea_admin,admin:true
           volumeMounts:
             - name: drone-data
               mountPath: /data
