@@ -115,7 +115,10 @@ helm upgrade --install gitea gitea-charts/gitea \
   --namespace devsecops --create-namespace \
   --set gitea.admin.username=gitea_admin \
   --set gitea.admin.password=wKuEf1krIb+1Gff6jocnpg== \
-  --set gitea.config.server.ROOT_URL=https://git.bootcamp.althunibat.xyz/
+  --set gitea.config.server.ROOT_URL=https://git.bootcamp.althunibat.xyz/ \
+  --set gitea.config.webhook.ALLOWED_HOST_LIST="drone-ci.bootcamp.althunibat.xyz\,private" \
+  --set "gitea.podTemplate.hostAliases[0].ip=10.43.216.224" \
+  --set "gitea.podTemplate.hostAliases[0].hostnames[0]=drone-ci.bootcamp.althunibat.xyz"
 
 kubectl apply -f gitea.ingress.yaml
 
@@ -139,6 +142,7 @@ kubectl apply -f gitea.ingress.yaml
 kubectl apply -f drone-ci.yaml
 
 # deploy drone runner using Colima VM and Docker directly
+colima ssh
 
 docker pull drone/drone-runner-docker:1
 
@@ -181,3 +185,39 @@ docker run --detach \
  kustomize edit set namespace myapp
  kustomize edit set image webapi=git.bootcamp.althunibat.xyz/gitea_admin/webapi:0.0.1-dev-1
  kubectl apply -k .
+# ----------- end session 3 ------------ #
+
+# update to drone-ci.yaml ==> make the gitea_admin user as admin to drone as well.
+# install dron cli
+brew tap drone/drone
+brew install drone
+# using gitea_admin 
+export DRONE_SERVER=https://drone-ci.bootcamp.althunibat.xyz/
+export DRONE_TOKEN=<drone-token> # for gitea_admin
+
+# promote "althunibat" as drone admin
+export DRONE_SERVER=https://drone-ci.bootcamp.althunibat.xyz/
+export DRONE_TOKEN=<drone-token> # for althunibat
+
+# create new repository
+# copy the dotnet code into there, and push it.
+# initialize .drone.yml
+# check documentations and explain the needed structure
+
+
+# add step to build dotnet
+# add step to build docker image
+# update dockerfile so it doesn't duplicate the build efforts.
+# introduce shared temp volume
+# introduce versioning through gitversion and build number.
+# optimize the container image by using alpine and use publish ready to run images.
+
+# recap on CI/CD process diagram.
+# ---- end session 4 ----
+
+
+# create secret to store kubeconfig
+drone secret add \
+  --repository gitea_admin/test-repo \
+  --name kube-config \
+  --data @/Users/althunibat/.kube/config
